@@ -5,7 +5,7 @@
   "repository": "https://github.com/cmgriffing/streamdeck-stinger-scene-transition.git",
   "scripts": {
     "parcel": "parcel",
-    "build:app": "parcel build ./src/app.js -d ./Sources",
+    "build:app": "parcel build ./src/app.js -d ./Sources/com.elgato.template.sdPlugin",
     "build": "npm-run-all -s build:app"
   },
   "author": "Chris Griffing <cmgriffing@gmail.com>",
