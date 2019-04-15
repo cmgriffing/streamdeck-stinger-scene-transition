@@ -50,7 +50,7 @@ const action = {
          this.setTitle(jsn);
     },
 
-    /** 
+    /**
      * The 'willAppear' event is the first event a key will receive, right before it gets
      * showed on your Stream Deck and/or in Stream Deck software.
      * This event is a good place to setup your plugin and look at current settings (if any),
@@ -61,11 +61,11 @@ const action = {
         console.log("You can cache your settings in 'onWillAppear'", jsn.payload.settings);
         /**
          * "The willAppear event carries your saved settings (if any). You can use these settings
-         * to setup your plugin or save the settings for later use. 
+         * to setup your plugin or save the settings for later use.
          * If you want to request settings at a later time, you can do so using the
-         * 'getSettings' event, which will tell Stream Deck to send your data 
+         * 'getSettings' event, which will tell Stream Deck to send your data
          * (in the 'didReceiceSettings above)
-         * 
+         *
          * $SD.api.getSettings(jsn.context);
         */
         this.settings = jsn.payload.settings;
@@ -83,14 +83,14 @@ const action = {
 
     onSendToPlugin: function (jsn) {
         /**
-         * this is a message sent directly from the Property Inspector 
-         * (e.g. some value, which is not saved to settings) 
+         * this is a message sent directly from the Property Inspector
+         * (e.g. some value, which is not saved to settings)
          * You can send this event from Property Inspector (see there for an example)
-         */ 
+         */
 
         const sdpi_collection = Utils.getProp(jsn, 'payload.sdpi_collection', {});
         if (sdpi_collection.value && sdpi_collection.value !== undefined) {
-            this.doSomeThing({ [sdpi_collection.key] : sdpi_collection.value }, 'onSendToPlugin', 'fuchsia');            
+            this.doSomeThing({ [sdpi_collection.key] : sdpi_collection.value }, 'onSendToPlugin', 'fuchsia');
         }
     },
 
@@ -115,9 +115,9 @@ const action = {
      * stored in settings.
      * If you enter something into Property Inspector's name field (in this demo),
      * it will get the title of your key.
-     * 
+     *
      * @param {JSON} jsn // the JSON object passed from Stream Deck to the plugin, which contains the plugin's context
-     * 
+     *
      */
 
     setTitle: function(jsn) {
@@ -136,8 +136,7 @@ const action = {
     doSomeThing: function(inJsonData, caller, tagColor) {
         console.log('%c%s', `color: white; background: ${tagColor || 'grey'}; font-size: 15px;`, `[app.js]doSomeThing from: ${caller}`);
         // console.log(inJsonData);
-    }, 
+    },
 
 
 };
-
