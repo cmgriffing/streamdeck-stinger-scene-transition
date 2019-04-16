@@ -1,8 +1,7 @@
-const OBSWebSocket = require('obs-websocket-js');
+/* global $CC, Utils, $SD, OBSWebSocket */
+
 const obs = new OBSWebSocket();
 obs.connect();
-
-/* global $CC, Utils, $SD */
 
 /**
  * Here are a couple of wrappers we created to help ypu quickly setup
