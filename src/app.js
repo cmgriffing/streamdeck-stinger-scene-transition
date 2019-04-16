@@ -1,3 +1,7 @@
+const OBSWebSocket = require('obs-websocket-js');
+const obs = new OBSWebSocket();
+obs.connect();
+
 /* global $CC, Utils, $SD */
 
 /**
@@ -77,8 +81,9 @@ const action = {
         this.setTitle(jsn);
     },
 
-    onKeyUp: function (jsn) {
+    onKeyUp: async function (jsn) {
         this.doSomeThing(jsn, 'onKeyUp', 'green');
+        console.log('onKeyUp', await obs.getSourcesList(), obs.getSourcesList())
     },
 
     onSendToPlugin: function (jsn) {
@@ -136,6 +141,8 @@ const action = {
     doSomeThing: function(inJsonData, caller, tagColor) {
         console.log('%c%s', `color: white; background: ${tagColor || 'grey'}; font-size: 15px;`, `[app.js]doSomeThing from: ${caller}`);
         // console.log(inJsonData);
+
+
     },
 
 
