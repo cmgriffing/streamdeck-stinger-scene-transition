@@ -2,6 +2,8 @@
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable no-else-return */
 
+let obs = new OBSWebSocket();
+
 /**
  * This example contains a working Property Inspector, which already communicates
  * with the corresponding plugin throug settings and/or direct messages.
@@ -42,7 +44,7 @@ let settings;
   * You can use it to subscribe to events you want to use in your plugin.
   */
 
-$SD.on('connected', (jsn) => {
+$SD.on('connected', async (jsn) => {
     /**
      * The passed 'applicationInfo' object contains various information about your
      * computer, Stream Deck version and OS-settings (e.g. colors as set in your
@@ -72,6 +74,31 @@ $SD.on('connected', (jsn) => {
     if (settings) {
         updateUI(settings);
     }
+
+    await obs.connect();
+
+    const sceneElement = document.querySelector('#scene');
+    const sceneOptions = (await obs.send('GetSceneList')).scenes
+        .map(function(scene) {
+            let selected = '';
+            if(settings.scene === scene.name) {
+                selected = 'selected';
+            }
+            return `<option value="${scene.name}" ${selected}>${scene.name}</option>`;
+        });
+    sceneElement.innerHTML = sceneOptions.join('');
+
+    const sourceElement = document.querySelector('#source');
+    const sourceOptions = (await obs.send('GetSourcesList')).sources
+        .map(function(source) {
+            let selected = '';
+            if(settings.source === source.name) {
+                selected = 'selected';
+            }
+            return `<option value ="${source.name}" ${selected}>${source.name}</option>`;
+        });
+    sourceElement.innerHTML = sourceOptions.join('');
+
 });
 
 /**
@@ -158,29 +185,11 @@ $SD.on('piDataChanged', (returnValue) => {
     console.log('%c%s', 'color: white; background: blue}; font-size: 15px;', 'piDataChanged');
     console.log(returnValue);
 
-    if (returnValue.key === 'clickme') {
+    /* SAVE THE VALUE TO SETTINGS */
+    saveSettings(returnValue);
 
-        postMessage = (w) => {
-            w.postMessage(
-                Object.assign({}, $SD.applicationInfo.application, {action: $SD.actionInfo.action})
-                ,'*');
-        }
-
-        if (!window.xtWindow || window.xtWindow.closed) {
-            window.xtWindow  = window.open('../externalWindow.html', 'External Window');
-            setTimeout(() => postMessage(window.xtWindow), 200);
-        } else {
-           postMessage(window.xtWindow);
-        }
-
-    } else {
-
-        /* SAVE THE VALUE TO SETTINGS */
-        saveSettings(returnValue);
-
-        /* SEND THE VALUES TO PLUGIN */
-        sendValueToPlugin(returnValue, 'sdpi_collection');
-    }
+    /* SEND THE VALUES TO PLUGIN */
+    sendValueToPlugin(returnValue, 'sdpi_collection');
 });
 
 /**

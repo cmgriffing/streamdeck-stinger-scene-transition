@@ -1,8 +1,5 @@
 /* global $CC, Utils, $SD, OBSWebSocket */
 
-const obs = new OBSWebSocket();
-obs.connect();
-
 /**
  * Here are a couple of wrappers we created to help ypu quickly setup
  * your plugin and subscribe to events sent by Stream Deck to your plugin.
@@ -15,9 +12,11 @@ obs.connect();
   * You can use it to subscribe to events you want to use in your plugin.
   */
 
+let obs = new OBSWebSocket();
+
 $SD.on('connected', (jsonObj) => connected(jsonObj));
 
-function connected(jsn) {
+async function connected(jsn) {
     /** subscribe to the willAppear and other events */
     $SD.on('com.elgato.template.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
     $SD.on('com.elgato.template.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
@@ -29,6 +28,9 @@ function connected(jsn) {
     $SD.on('com.elgato.template.action.propertyInspectorDidDisappear', (jsonObj) => {
         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
     });
+
+        
+    await obs.connect();
 };
 
 /** ACTIONS */
@@ -50,7 +52,7 @@ const action = {
          * the key.
          */
 
-         this.setTitle(jsn);
+         //this.setTitle(jsn);
     },
 
     /**
@@ -74,15 +76,59 @@ const action = {
         this.settings = jsn.payload.settings;
 
         // nothing in the settings pre-fill something just for demonstration purposes
-        if (!this.settings || Object.keys(this.settings).length === 0) {
-            this.settings.mynameinput = 'TEMPLATE';
-        }
-        this.setTitle(jsn);
+        // if (!this.settings || Object.keys(this.settings).length === 0) {
+        //     this.settings.mynameinput = 'TEMPLATE';
+        // }
+        // this.setTitle(jsn);
     },
 
     onKeyUp: async function (jsn) {
-        this.doSomeThing(jsn, 'onKeyUp', 'green');
-        console.log('onKeyUp', await obs.getSourcesList(), obs.getSourcesList())
+
+        const currentScene = await obs.send('GetCurrentScene');
+
+        await obs.send(
+            'SetSceneItemProperties',
+            {
+                'scene-name': currentScene.name,
+                item: this.settings.source,
+                visible: true
+            },
+        );
+        await obs.send(
+            'SetSceneItemProperties',
+            {
+                'scene-name': this.settings.scene,
+                item: this.settings.source,
+                visible: true
+            },
+        );
+
+        await Utils.sleep(1500);
+
+        await obs.send(
+            'SetCurrentScene',
+            {
+                'scene-name': this.settings.scene,
+            },
+        );
+        
+        await Utils.sleep(3000);
+        
+        await obs.send(
+            'SetSceneItemProperties',
+            {
+                'scene-name': currentScene.name,
+                item: this.settings.source,
+                visible: false
+            },
+        );
+        await obs.send(
+            'SetSceneItemProperties',
+            {
+                item: this.settings.source,
+                visible: false
+            },
+        );
     },
 
     onSendToPlugin: function (jsn) {
