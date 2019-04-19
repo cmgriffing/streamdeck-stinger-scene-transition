@@ -23,7 +23,7 @@ async function connected(jsn) {
     $SD.on('com.elgato.template.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
     $SD.on('com.elgato.template.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
     $SD.on('com.elgato.template.action.propertyInspectorDidAppear', (jsonObj) => {
-        console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:');
+        console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:', jsonObj);
     });
     $SD.on('com.elgato.template.action.propertyInspectorDidDisappear', (jsonObj) => {
         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
@@ -41,6 +41,7 @@ const action = {
         console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[app.js]onDidReceiveSettings:');
 
         this.settings = Utils.getProp(jsn, 'payload.settings', {});
+        console.log({jsn})
         this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');
 
         /**
@@ -84,48 +85,50 @@ const action = {
 
     onKeyUp: async function (jsn) {
 
+        console.log('onKeyUp', jsn);
+
         const currentScene = await obs.send('GetCurrentScene');
 
         await obs.send(
             'SetSceneItemProperties',
             {
                 'scene-name': currentScene.name,
-                item: this.settings.source,
+                item: jsn.payload.settings.source,
                 visible: true
             },
         );
         await obs.send(
             'SetSceneItemProperties',
             {
-                'scene-name': this.settings.scene,
-                item: this.settings.source,
+                'scene-name': jsn.payload.settings.scene,
+                item: jsn.payload.settings.source,
                 visible: true
             },
         );
 
-        await Utils.sleep(1500);
-
+        await Utils.sleep(1000);
+        console.log({ ...this.settings });
         await obs.send(
             'SetCurrentScene',
             {
-                'scene-name': this.settings.scene,
+                'scene-name': jsn.payload.settings.scene,
             },
         );
         
-        await Utils.sleep(3000);
+        await Utils.sleep(1500);
         
         await obs.send(
             'SetSceneItemProperties',
             {
                 'scene-name': currentScene.name,
-                item: this.settings.source,
+                item: jsn.payload.settings.source,
                 visible: false
             },
         );
         await obs.send(
             'SetSceneItemProperties',
             {
-                item: this.settings.source,
+                item: jsn.payload.settings.source,
                 visible: false
             },
         );
@@ -144,21 +147,6 @@ const action = {
         }
     },
 
-    /**
-     * This snippet shows, how you could save settings persistantly to Stream Deck software
-     * It is not used in this example plugin.
-     */
-
-    saveSettings: function (jsn, sdpi_collection) {
-        console.log('saveSettings:', jsn);
-        if (sdpi_collection.hasOwnProperty('key') && sdpi_collection.key != '') {
-            if (sdpi_collection.value && sdpi_collection.value !== undefined) {
-                this.settings[sdpi_collection.key] = sdpi_collection.value;
-                console.log('setSettings....', this.settings);
-                $SD.api.setSettings(jsn.context, this.settings);
-            }
-        }
-    },
 
     /**
      * Here's a quick demo-wrapper to show how you could change a key's title based on what you
