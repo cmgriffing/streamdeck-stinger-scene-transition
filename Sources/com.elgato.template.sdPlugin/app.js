@@ -118,10 +118,28 @@ const action = {
 
     const currentScene = await obs.call("GetCurrentProgramScene");
 
+    const nextSceneItems = await obs.call("GetSceneItemList", {
+      sceneName: jsn.payload.settings.scene,
+    });
+
+    const nextSceneItem = nextSceneItems.sceneItems.find(
+      (sceneItem) => sceneItem.sceneItemId === jsn.payload.settings.source
+    );
+
+    const currentSceneItems = await obs.call("GetSceneItemList", {
+      sceneName: currentScene.currentProgramSceneName,
+    });
+
+    const currentSceneItem = currentSceneItems.sceneItems.find(
+      (sceneItem) => sceneItem.sourceName === nextSceneItem.sourceName
+    );
+
+    console.log({ currentSceneItems, nextSceneItems });
+
     await obs
       .call("SetSceneItemEnabled", {
         sceneName: currentScene.currentProgramSceneName,
-        sceneItemId: jsn.payload.settings.source,
+        sceneItemId: currentSceneItem.sceneItemId,
         sceneItemEnabled: true,
       })
       .catch(() => {});
@@ -146,7 +164,7 @@ const action = {
     await obs
       .call("SetSceneItemEnabled", {
         sceneName: currentScene.currentProgramSceneName,
-        sceneItemId: jsn.payload.settings.source,
+        sceneItemId: currentSceneItem.sceneItemId,
         sceneItemEnabled: false,
       })
       .catch(() => {});
