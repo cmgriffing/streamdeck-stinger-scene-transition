@@ -5,13 +5,14 @@
   "repository": "https://github.com/cmgriffing/streamdeck-stinger-scene-transition.git",
   "scripts": {
     "parcel": "parcel",
+    "dev:cp:plugin": "cp -R ./Sources/com.elgato.template.sdPlugin ~/Library/Application\\ Support/com.elgato.StreamDeck/Plugins/",
     "build:app": "parcel build ./src/app.js -d ./Sources/com.elgato.template.sdPlugin --target node --bundle-node-modules",
     "build": "npm-run-all -s build:app"
   },
   "author": "Chris Griffing <cmgriffing@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "obs-websocket-js": "^3.0.0"
+    "obs-websocket-js": "^5.0.2"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",
