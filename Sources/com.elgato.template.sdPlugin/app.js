@@ -136,14 +136,14 @@ const action = {
 
     console.log({ currentSceneItems, nextSceneItems });
 
-    await obs
+    obs
       .call("SetSceneItemEnabled", {
         sceneName: currentScene.currentProgramSceneName,
         sceneItemId: currentSceneItem.sceneItemId,
         sceneItemEnabled: true,
       })
       .catch(() => {});
-    await obs
+    obs
       .call("SetSceneItemEnabled", {
         sceneName: jsn.payload.settings.scene,
         sceneItemId: jsn.payload.settings.source,
@@ -161,14 +161,14 @@ const action = {
 
     await Utils.sleep(1500);
 
-    await obs
+    obs
       .call("SetSceneItemEnabled", {
         sceneName: currentScene.currentProgramSceneName,
         sceneItemId: currentSceneItem.sceneItemId,
         sceneItemEnabled: false,
       })
       .catch(() => {});
-    await obs
+    obs
       .call("SetSceneItemEnabled", {
         sceneName: jsn.payload.settings.scene,
         sceneItemId: jsn.payload.settings.source,
